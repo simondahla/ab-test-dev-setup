@@ -2,13 +2,18 @@ var gulp = require('gulp')
 var util = require('gulp-util')
 var browserSync = require('browser-sync').create()
 
+var __proxy = util.env.proxy || 'https://www.google.se/'
+__proxy = __proxy.toString()
+
+var __host = '//' + util.env.host || '//localhost'
+__host = __host.toString()
+
 // use default task to launch Browsersync and watch JS files
 gulp.task('default', function () {
-  var __proxy = util.env.proxy || 'https://www.google.se/'
-  __proxy = __proxy.toString()
-
   // Serve files from the root of this project
   browserSync.init({
+    host: __host,
+    open: 'external',
     port: 9000,
     proxy: {
       target: __proxy,
