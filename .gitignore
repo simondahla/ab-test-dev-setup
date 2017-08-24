@@ -1,6 +1,5 @@
 # Used for local testing
-variant.js
-variant.css
+yarn.lock
 
 # Created by https://www.gitignore.io/api/osx,node,linux,bower,windows
 
