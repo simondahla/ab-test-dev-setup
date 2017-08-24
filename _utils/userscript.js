@@ -1,92 +1,99 @@
 // ==UserScript==
-// @name         JS&CSS Injection
-// @namespace    https://www.spotify.com
-// @version      0.1
+// @name         JS&CSS Injection ab-test-dev-setup
+// @version      1.0
 // @description  Insert JS and CSS to the <head>
 // @author       Simon Dahla
+// @copyright    2017+, Simon Dahla
 // @match        http*://localhost:*/*
+// @include      /ab=(true|1)/
+// @icon         http://⚡️.ingenmansland.se/ab-test-dev-setup/icon.png
+// @icon64       http://⚡️.ingenmansland.se/ab-test-dev-setup/icon64.png
+// @supportURL   https://github.com/simondahla/ab-test-dev-setup/issues
+// @downloadURL  https://github.com/simondahla/ab-test-dev-setup/
 // ==/UserScript==
 
 /**
- * Must be written in ES5
+ * N.B. All code in this file must be written in ES5
  */
 
-(function() {
-    var consoleStyles = {
-        success: [
-            'background-color: green;',
-            'color: white;',
-            'display: block;',
-            'padding: .5em 1em;',
-            'margin: 1em 0;'
-        ],
-        error: [
-            'background-color: red;',
-            'color: white;',
-            'display: block;',
-            'padding: .5em 1em;',
-            'margin: 1em 0;'
-        ]
-    }
+/* eslint-disable semi */
 
-    function getParameterByName(name, url) {
-        if (!url) url = window.location.href;
-        name = name.replace(/[\[\]]/g, "\\$&");
-        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-            results = regex.exec(url);
-        if (!results) return null;
-        if (!results[2]) return '';
-        return decodeURIComponent(results[2].replace(/\+/g, " "));
-    }
+(function () {
+  var consoleStyles = {
+    success: [
+      'background-color: green;',
+      'color: white;',
+      'display: block;',
+      'padding: .5em 1em;',
+      'margin: 1em 0;'
+    ],
+    error: [
+      'background-color: red;',
+      'color: white;',
+      'display: block;',
+      'padding: .5em 1em;',
+      'margin: 1em 0;'
+    ]
+  };
 
-    function addScript(ls, folder, fileName) {
-        if (fileName === null) fileName = 'variant.js';
-        var head = document.getElementsByTagName('head')[0];
-        var script = document.createElement('script');
+  function getParameterByName (name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+    var results = regex.exec(url);
 
-        script.type = 'text/javascript';
-        script.src = ls + folder + fileName;
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+  }
 
-        script.onload = function() {
-            console.info('%c 📣 Script loaded: ' + script.src, consoleStyles.success.join(';') );
-        };
+  function addScript (ls, folder, fileName) {
+    if (fileName === null) fileName = 'variant.js';
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
 
-        script.onerror = function() {
-            console.warn('%c ☠️ Script NOT loaded: ' + script.src, consoleStyles.error.join(';') );
-        };
+    script.type = 'text/javascript';
+    script.src = ls + folder + fileName;
 
-        head.appendChild(script);
-    }
+    script.onload = function () {
+      console.info('%c 📣 Script loaded: ' + script.src, consoleStyles.success.join(';'));
+    };
 
-    function addStyle(ls, folder, fileName) {
-        if (fileName === null) fileName = 'variant.css';
-        var head = document.getElementsByTagName('head')[0];
-        var style = document.createElement('link');
+    script.onerror = function () {
+      console.warn('%c ☠️ Script NOT loaded: ' + script.src, consoleStyles.error.join(';'));
+    };
 
-        style.rel = 'stylesheet';
-        style.href = ls + folder + fileName;
+    head.appendChild(script);
+  }
 
-        style.onload = function() {
-            console.info('%c 📣 Style loaded: ' + style.href, consoleStyles.success.join(';') );
-        };
+  function addStyle (ls, folder, fileName) {
+    if (fileName === null) fileName = 'variant.css';
+    var head = document.getElementsByTagName('head')[0];
+    var style = document.createElement('link');
 
-        style.onerror = function() {
-            console.warn('%c ☠️ Style NOT loaded: ' + style.href, consoleStyles.error.join(';') );
-        };
+    style.rel = 'stylesheet';
+    style.href = ls + folder + fileName;
 
-        head.appendChild(style);
-    }
+    style.onload = function () {
+      console.info('%c 📣 Style loaded: ' + style.href, consoleStyles.success.join(';'));
+    };
 
-    var ls = '//localhost:9000/';
-    var folder = getParameterByName('folder') || '';
+    style.onerror = function () {
+      console.warn('%c ☠️ Style NOT loaded: ' + style.href, consoleStyles.error.join(';'));
+    };
 
-    if (folder !== '') {
-        folder = 'experiment/' + folder + '/';
-    } else {
-        folder = 'experiment/_utils/';
-    }
+    head.appendChild(style);
+  }
 
-    addStyle(ls, folder, getParameterByName('css') );
-    addScript(ls, folder, getParameterByName('js') );
+  var ls = '//localhost:9000/';
+  var folder = getParameterByName('folder') || '';
 
+  if (folder !== '') {
+    folder = 'experiment/' + folder + '/';
+  } else {
+    folder = 'experiment/_utils/';
+  }
+
+  addStyle(ls, folder, getParameterByName('css'));
+  addScript(ls, folder, getParameterByName('js'));
 })();
