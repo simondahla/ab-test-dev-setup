@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         JS&CSS Injection ab-test-dev-setup
+// @name         JS&CSS Injection for AB-test-dev-setup
 // @version      1.0
 // @description  Insert JS and CSS to the <head>
 // @author       Simon Dahla
