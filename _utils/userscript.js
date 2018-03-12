@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         JS&CSS Injection for AB-test-dev-setup
-// @version      1.0
+// @version      1.1
 // @description  Insert JS and CSS to the <head>
 // @author       Simon Dahla
 // @copyright    2017+, Simon Dahla
@@ -16,7 +16,7 @@
  * N.B. All code in this file must be written in ES5
  */
 
-/* eslint-disable semi */
+
 
 (function () {
   var consoleStyles = {
@@ -36,19 +36,7 @@
     ]
   };
 
-  function getParameterByName (name, url) {
-    if (!url) url = window.location.href;
-    name = name.replace(/[[\]]/g, '\\$&');
-    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
-    var results = regex.exec(url);
-
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, ' '));
-  }
-
   function addScript (ls, folder, fileName) {
-    if (fileName === null) fileName = 'variant.js';
     var head = document.getElementsByTagName('head')[0];
     var script = document.createElement('script');
 
@@ -67,7 +55,6 @@
   }
 
   function addStyle (ls, folder, fileName) {
-    if (fileName === null) fileName = 'variant.css';
     var head = document.getElementsByTagName('head')[0];
     var style = document.createElement('link');
 
@@ -85,8 +72,32 @@
     head.appendChild(style);
   }
 
+  function getURLParam(key,target){
+    var values = [];
+    if (!target) target = location.href;
+
+    key = key.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+
+    var pattern = key + '=([^&#]+)';
+    var o_reg = new RegExp(pattern,'ig');
+    while (true){
+        var matches = o_reg.exec(target);
+        if (matches && matches[1]){
+            values.push(matches[1]);
+        } else {
+            break;
+        }
+    }
+
+    if (!values.length){
+        return null;
+    } else {
+        return values.length == 1 ? values[0] : values;
+    }
+  }
+
   var ls = '//localhost:9000/';
-  var folder = getParameterByName('folder') || '';
+  var folder = getURLParam('folder') || '';
 
   if (folder !== '') {
     folder = 'experiment/' + folder + '/';
@@ -94,6 +105,32 @@
     folder = 'experiment/_utils/';
   }
 
-  addStyle(ls, folder, getParameterByName('css'));
-  addScript(ls, folder, getParameterByName('js'));
+  var css = getURLParam('css') || getURLParam('css[]');
+  var js = getURLParam('js') || getURLParam('js[]');
+
+  if (typeof css === 'string') {
+    addStyle(ls, folder, css);
+
+  } else if (typeof css === 'object' && css !== null) {
+    css.forEach(function(o) {
+        addStyle(ls, folder, o);
+    });
+  } else {
+    // default
+    addStyle(ls, folder, 'variant.css');
+  }
+
+  if (typeof js === 'string') {
+    addScript(ls, folder, js);
+
+  } else if (typeof js === 'object' && js !== null) {
+    js.forEach(function(o) {
+        addScript(ls, folder, o);
+    });
+  } else {
+    // default
+    addScript(ls, folder, 'variant.js');
+  }
+
+
 })();
